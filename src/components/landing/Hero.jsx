@@ -1,135 +1,116 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole.jsx';
-import { Lock, ScanSearch, ShieldCheck, Scale, ArrowRight, ShieldAlert } from 'lucide-react';
+import { ArrowRight, Box, BrainCircuit, Building2, Database, Package, Play, Users } from 'lucide-react';
+import { getTenders } from '../../services/tenderService.js';
+import { getSuppliers } from '../../services/supplierRegistry.js';
+
+const HERO_NODES = [
+  { name: 'Authority', detail: 'Creates Tender', icon: Building2, position: 'top' },
+  { name: 'AI Intelligence', detail: 'Detects Patterns', icon: BrainCircuit, position: 'upper-right' },
+  { name: 'Milestones & Payment', detail: 'Releases on Performance', icon: Package, position: 'lower-right' },
+  { name: 'Escrow', detail: 'Contract-controlled', icon: Database, position: 'bottom' },
+  { name: 'Blockchain', detail: 'Enforces Rules', icon: Box, position: 'lower-left' },
+  { name: 'Suppliers', detail: 'Bid Privately', icon: Users, position: 'upper-left' }
+];
 
 export function Hero() {
   const navigate = useNavigate();
   const { setRole } = useRole();
+  const [stats, setStats] = useState(null);
 
-  const handleExploreClick = (e) => {
-    e.preventDefault();
-    const workspacesSection = document.getElementById('workspaces');
-    if (workspacesSection) {
-      workspacesSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  useEffect(() => {
+    let active = true;
+    Promise.all([getTenders(), getSuppliers()]).then(([tenders, suppliers]) => {
+      if (active) {
+        setStats({
+          tenderCount: tenders.length,
+          totalBudget: tenders.reduce((sum, tender) => sum + Number(tender.budget || 0), 0),
+          supplierCount: suppliers.filter((supplier) => supplier.verifiedOnChain).length
+        });
+      }
+    });
+    return () => { active = false; };
+  }, []);
 
-  const handleSampleReportClick = () => {
-    // Set role to auditor and navigate to /auditor/risk/T002
+  const handleLiveDemoClick = () => {
     setRole('auditor');
-    navigate('/auditor/risk/T002');
+    navigate('/auditor/decision-report');
   };
-
-  const flowNodes = [
-    {
-      title: 'SEALED BID',
-      caption: 'Client-side salt & hash',
-      icon: Lock
-    },
-    {
-      title: 'AI RISK ANALYSIS',
-      caption: 'Pattern & anomaly check',
-      icon: ScanSearch
-    },
-    {
-      title: 'BLOCKCHAIN AUDIT',
-      caption: 'Tamper-evident log',
-      icon: ShieldCheck
-    },
-    {
-      title: 'TRANSPARENT DECISION',
-      caption: 'Human review & award',
-      icon: Scale
-    }
-  ];
 
   return (
-    <section className="relative pt-12 pb-20 md:pt-20 md:pb-24 overflow-hidden">
-      {/* Subtle radial blue tint behind hero */}
-      <div
-        className="pointer-events-none absolute inset-0 -top-24 bg-[radial-gradient(ellipse_60%_50%_at_50%_20%,rgba(59,130,246,0.12),transparent_70%)]"
-        aria-hidden="true"
-      />
+    <section className="relative overflow-hidden pb-16 pt-12 sm:pt-16 lg:pb-24" id="product">
+      <div className="pointer-events-none absolute -top-20 left-1/3 h-[420px] w-[620px] rounded-full bg-[#FF4A3D]/[0.09] blur-[100px]" aria-hidden="true" />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
-        {/* Eyebrow badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1E2A44] bg-[#111A2E]/80 text-xs font-medium text-slate-300 mb-6 shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" aria-hidden="true" />
-          <span>Procurement Integrity Layer</span>
-        </div>
+      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:gap-6 lg:px-8">
+        <div className="relative z-10">
+          <div className="mb-6 flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.28em] text-slate-400">
+            <span className="h-px w-10 bg-[#FF4A3D]" aria-hidden="true" />
+            Autonomous Procurement on MST
+          </div>
 
-        {/* Brand H1 */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.08] mb-4">
-          Open<span className="text-blue-500">Tender</span>
-        </h1>
+          <h1 className="text-[3.6rem] font-semibold leading-[0.88] tracking-[-0.055em] sm:text-7xl lg:text-[5rem] xl:text-[5.5rem]">
+            <span className="block text-white">Tender</span>
+            <span className="block bg-gradient-to-r from-[#FF4A3D] to-[#FF8A54] bg-clip-text text-transparent">Guard</span>
+          </h1>
 
-        {/* Tagline */}
-        <p className="text-xl sm:text-2xl lg:text-3xl font-medium text-slate-200 max-w-3xl mx-auto tracking-tight mb-6">
-          Bid privately. Detect suspicious patterns. Award transparently.
-        </p>
-
-        {/* Supporting description */}
-        <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
-          AI-powered procurement with secure sealed bidding, intelligent risk detection, and a tamper-evident blockchain audit trail.
-        </p>
-
-        {/* CTA Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <a
-            href="#workspaces"
-            onClick={handleExploreClick}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220] shadow-sm"
-          >
-            <span>Explore OpenTender</span>
-            <ArrowRight className="w-4 h-4" aria-hidden="true" />
-          </a>
-
-          <button
-            type="button"
-            onClick={handleSampleReportClick}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-[#111A2E] hover:bg-[#1E2A44] border border-[#1E2A44] text-slate-200 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220]"
-          >
-            <ShieldAlert className="w-4 h-4 text-blue-400" aria-hidden="true" />
-            <span>View sample risk report</span>
-          </button>
-        </div>
-
-        {/* Flow Visual: 4 Connected Nodes */}
-        <div className="pt-8 border-t border-[#1E2A44]/70">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-6">
-            End-to-End Cryptographic & AI Pipeline
+          <p className="mt-6 max-w-xl text-xl font-medium leading-snug text-slate-400 sm:text-2xl">
+            <span className="text-white">Bid privately.</span>{' '}
+            <span className="text-[#FF6B4A]">Detect suspicious patterns.</span>{' '}
+            <span className="text-white">Award transparently.</span>
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
-            {flowNodes.map((node, index) => {
-              const Icon = node.icon;
-              return (
-                <div
-                  key={node.title}
-                  className="relative flex flex-col items-center p-4 rounded-lg bg-[#111A2E]/60 border border-[#1E2A44] text-center"
-                >
-                  {/* Connector arrow on desktop between nodes */}
-                  {index < flowNodes.length - 1 && (
-                    <div
-                      className="hidden lg:block absolute -right-3.5 top-1/2 -translate-y-1/2 z-10 w-3 h-0.5 bg-[#1E2A44]"
-                      aria-hidden="true"
-                    />
-                  )}
+          <p className="mt-5 max-w-lg text-sm leading-7 text-slate-400 sm:text-base">
+            AI-powered procurement with secure sealed bidding, intelligent risk detection, and a tamper-evident blockchain audit trail.
+          </p>
 
-                  <div className="w-10 h-10 rounded-md bg-[#0B1220] border border-[#1E2A44] flex items-center justify-center text-blue-400 mb-3 shadow-inner">
-                    <Icon className="w-5 h-5" aria-hidden="true" />
-                  </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="#workspaces" className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#FF4A3D] to-[#FF6B4A] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_8px_30px_rgba(255,74,61,0.2)] transition hover:brightness-110">
+              Explore Procurement <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+            <button type="button" onClick={handleLiveDemoClick} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.025] px-6 py-3.5 text-sm font-medium text-slate-200 transition hover:border-rose-400/35 hover:bg-white/[0.05]">
+              <Play className="h-4 w-4 text-[#FF6B4A]" aria-hidden="true" /> View Live Demo
+            </button>
+          </div>
 
-                  <span className="text-xs font-semibold text-white tracking-wide uppercase mb-1">
-                    {node.title}
-                  </span>
-                  <span className="text-[11px] text-slate-400">
-                    {node.caption}
-                  </span>
+          <div className="mt-10 flex flex-wrap gap-x-8 gap-y-5 border-t border-white/10 pt-6">
+            <div><strong className="text-xl font-semibold text-[#FF6B4A]">{stats ? stats.tenderCount : '—'}</strong><span className="ml-2 text-xs text-slate-400">Tenders Tracked</span></div>
+            <div><strong className="text-xl font-semibold text-[#FF6B4A]">{stats ? `₹${(stats.totalBudget / 10000000).toLocaleString('en-IN', { maximumFractionDigits: 1 })} Cr` : '—'}</strong><span className="ml-2 text-xs text-slate-400">Total Procurement Value</span></div>
+            <div><strong className="text-xl font-semibold text-[#FF6B4A]">{stats ? stats.supplierCount : '—'}</strong><span className="ml-2 text-xs text-slate-400">Verified Suppliers</span></div>
+          </div>
+        </div>
+
+        <div className="relative mx-auto h-[440px] w-full max-w-[640px] sm:h-[520px]" aria-label="TenderGuard procurement system diagram">
+          <div className="landing-orbit" aria-hidden="true" />
+          <div className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FF4A3D]/[0.08] blur-3xl sm:h-72 sm:w-72" aria-hidden="true" />
+
+          <svg className="landing-cube-glow absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 sm:h-56 sm:w-56" viewBox="0 0 240 240" role="img" aria-label="Layered data block representing procurement records">
+            <defs>
+              <linearGradient id="cubeStroke" x1="0" x2="1" y1="0" y2="1"><stop stopColor="#FF6B4A" stopOpacity=".82" /><stop offset="1" stopColor="#FF4A3D" stopOpacity=".25" /></linearGradient>
+              <filter id="cubeBlur"><feGaussianBlur stdDeviation="7" /></filter>
+            </defs>
+            <rect x="55" y="42" width="128" height="132" rx="20" fill="#FF4A3D" fillOpacity=".17" filter="url(#cubeBlur)" />
+            <rect x="39" y="72" width="135" height="122" rx="19" fill="#111216" stroke="url(#cubeStroke)" strokeWidth="1.5" transform="rotate(-8 106 133)" />
+            <rect x="53" y="57" width="135" height="122" rx="19" fill="#14151B" stroke="url(#cubeStroke)" strokeWidth="1.5" transform="rotate(5 120 118)" />
+            <rect x="49" y="46" width="135" height="122" rx="19" fill="#17171D" stroke="url(#cubeStroke)" strokeWidth="1.8" />
+            <path d="M78 88h77M78 108h54M78 128h66" stroke="#FF6B4A" strokeOpacity=".6" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="163" cy="145" r="5" fill="#FF6B4A" />
+          </svg>
+
+          {HERO_NODES.map((node) => {
+            const Icon = node.icon;
+            return (
+              <div key={node.name} className={`absolute z-10 flex w-[100px] flex-col items-center text-center sm:w-[128px] landing-node-${node.position}`}>
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#FF4A3D]/45 bg-[#0D0F14] text-[#FF6B4A] shadow-[0_0_24px_rgba(255,74,61,0.12)] sm:h-11 sm:w-11">
+                  <Icon className="h-[17px] w-[17px]" aria-hidden="true" />
                 </div>
-              );
-            })}
+                <span className="mt-2 text-[8px] font-semibold uppercase leading-tight tracking-[0.14em] text-white sm:text-[9px]">{node.name}</span>
+                <span className="mt-1 text-[8px] leading-tight text-slate-400 sm:text-[9px]">{node.detail}</span>
+              </div>
+            );
+          })}
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full border border-white/10 bg-[#0D0F14]/85 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-slate-500">
+            Tamper-evident record
           </div>
         </div>
       </div>

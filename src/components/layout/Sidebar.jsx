@@ -11,7 +11,12 @@ import {
   Send,
   Eye,
   ScrollText,
-  Building2
+  Building2,
+  Scale,
+  Users,
+  Layers,
+  History,
+  Coins
 } from 'lucide-react';
 
 export function Sidebar() {
@@ -23,13 +28,16 @@ export function Sidebar() {
         section: 'Oversight & Compliance',
         items: [
           { label: 'Auditor Dashboard', to: '/auditor', icon: LayoutDashboard },
-          { label: 'Risk Analysis (T002)', to: '/auditor/risk/T002', icon: ShieldAlert },
-          { label: 'Blockchain Audit Trail', to: '/audit/T002', icon: ScrollText }
+          { label: 'Risk Analysis (T002)', to: '/auditor/risk-analysis', icon: ShieldAlert },
+          { label: 'Decision Report (T001)', to: '/auditor/decision-report', icon: Scale },
+          { label: 'Blockchain Ledger', to: '/auditor/blockchain', icon: ScrollText },
+          { label: 'Audit Trail (T002)', to: '/audit/T002', icon: FileCheck2 }
         ]
       },
       {
-        section: 'General Exploration',
+        section: 'Registries & Exploration',
         items: [
+          { label: 'Supplier Registry', to: '/suppliers', icon: Users },
           { label: 'Sample Tender (T001)', to: '/tenders/T001', icon: FileText }
         ]
       }
@@ -39,13 +47,15 @@ export function Sidebar() {
         section: 'Procurement Authority',
         items: [
           { label: 'Admin Dashboard', to: '/admin', icon: LayoutDashboard },
-          { label: 'Create Tender', to: '/admin/create', icon: PlusCircle }
+          { label: 'Manage Tenders', to: '/admin/tenders', icon: FileText },
+          { label: 'Create Tender', to: '/admin/tenders/create', icon: PlusCircle }
         ]
       },
       {
         section: 'Verification & Audit',
         items: [
-          { label: 'Tender Overview (T001)', to: '/tenders/T001', icon: FileText },
+          { label: 'Supplier Registry', to: '/suppliers', icon: Users },
+          { label: 'Tender Overview (T001)', to: '/admin/tenders/T001', icon: FileText },
           { label: 'Audit Trail (T001)', to: '/audit/T001', icon: FileCheck2 }
         ]
       }
@@ -55,14 +65,18 @@ export function Sidebar() {
         section: 'Bidding Operations',
         items: [
           { label: 'Contractor Dashboard', to: '/contractor', icon: LayoutDashboard },
-          { label: 'Submit Sealed Bid (T002)', to: '/contractor/bid/T002', icon: Send },
-          { label: 'Reveal Bid (T001)', to: '/contractor/reveal/T001', icon: Eye }
+          { label: 'Browse Tenders', to: '/contractor/tenders', icon: FileText },
+          { label: 'My Bids', to: '/contractor/bids', icon: History },
+          { label: 'Reputation', to: '/contractor/reputation', icon: Users },
+          { label: 'Profile', to: '/contractor/profile', icon: Building2 }
         ]
       },
       {
-        section: 'Tenders',
+        section: 'Contracts & Payments',
         items: [
-          { label: 'Browse Tender (T001)', to: '/tenders/T001', icon: FileText }
+          { label: 'Active Contracts', to: '/contractor/contracts', icon: FileCheck2 },
+          { label: 'Payments', to: '/contractor/payments', icon: Coins },
+          { label: 'Supplier Registry', to: '/suppliers/TG-1042', icon: Users }
         ]
       }
     ]
@@ -112,13 +126,34 @@ export function Sidebar() {
             })}
           </div>
         ))}
+
+        {/* Dev Gallery link */}
+        <div className="pt-2 border-t border-[#1E2A44]/60">
+          <h4 className="px-3 text-[10px] font-semibold text-amber-400/80 uppercase tracking-wider mb-1">
+            Developer Preview
+          </h4>
+          <NavLink
+            to="/dev/components"
+            className={({ isActive }) =>
+              clsx(
+                'flex items-center gap-3 px-3 py-2 rounded-md text-xs font-medium transition-colors',
+                isActive
+                  ? 'bg-amber-950/40 text-amber-300 border-l-2 border-amber-500 font-semibold'
+                  : 'text-amber-400/70 hover:text-amber-300 hover:bg-[#111A2E]'
+              )
+            }
+          >
+            <Layers className="w-4 h-4 shrink-0 text-amber-400" />
+            <span>Component Gallery</span>
+          </NavLink>
+        </div>
       </nav>
 
       {/* Trust & Verification note */}
       <div className="p-4 border-t border-[#1E2A44] text-xs text-slate-400 leading-relaxed bg-[#0E1626]/40">
         <p className="font-medium text-slate-300 mb-0.5">Tamper-Evident Record</p>
         <p className="text-[11px] text-slate-400">
-          All tender states, bids, and actions are logged to a verifiable event trail.
+          AI analyzes. Blockchain enforces. Humans oversee.
         </p>
       </div>
     </aside>

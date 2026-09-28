@@ -11,16 +11,10 @@ export const ROLES = [
 ];
 
 export function RoleProvider({ children }) {
-  // Default role: auditor, strictly in-memory (no localStorage / sessionStorage)
   const [role, setRoleState] = useState('auditor');
-  const navigate = useNavigate();
 
   const setRole = (newRole) => {
     setRoleState(newRole);
-    const target = ROLES.find((r) => r.id === newRole);
-    if (target) {
-      navigate(target.homeRoute);
-    }
   };
 
   return (

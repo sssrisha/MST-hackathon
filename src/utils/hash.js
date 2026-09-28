@@ -12,6 +12,16 @@ export async function makeCommitment(amount, salt) {
   return `0x${hex}`;
 }
 
+export function makeBidCommitment({ tenderId, wallet, amount, salt }) {
+  const cleanWallet = String(wallet || '').trim().toLowerCase();
+  const cleanAmount = Number(amount);
+  const preimage = `${tenderId}:${cleanWallet}:${cleanAmount}:${String(salt)}`;
+  const hex = Array.from(new TextEncoder().encode(preimage))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  return `0x${hex}`;
+}
+
 export function generateSalt() {
   const array = new Uint8Array(16);
   window.crypto.getRandomValues(array);
