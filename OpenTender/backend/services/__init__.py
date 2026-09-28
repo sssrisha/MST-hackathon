@@ -1,0 +1,1 @@
+"""Application services such as password and bid protection."""
