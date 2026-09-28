@@ -93,11 +93,11 @@ export function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1220] text-slate-100 px-4 py-8 md:px-8">
+    <div className="tg-internal min-h-screen bg-[#0B1220] text-slate-100 px-4 py-8 md:px-8">
       <div className="mx-auto max-w-6xl rounded-2xl border border-[#1E2A44] bg-[#111A2E] shadow-2xl overflow-hidden">
         <div className="border-b border-[#1E2A44] bg-[#0E1626] px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-950/40 border border-blue-900/60 flex items-center justify-center text-blue-400">
+            <div className="w-10 h-10 rounded-lg bg-[#FF4B3E]/10 border border-[#FF4B3E]/25 flex items-center justify-center text-[#FF6B4A]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -193,7 +193,7 @@ export function SignupPage() {
             {errors.submit && <div className="rounded-lg border border-rose-800 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{errors.submit}</div>}
 
             <div className="flex items-center justify-between gap-3 pt-3">
-              <div className="text-sm text-slate-400">Already have an account? <Link to="/contractor/login" className="text-blue-300">Sign in</Link></div>
+              <div className="text-sm text-slate-400">Already have an account? <Link to="/contractor/login" className="text-[#FF8A72] hover:text-[#FFB09C]">Sign in</Link></div>
               <button type="submit" disabled={loading} className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-60">{loading ? 'Creating account...' : 'Create Contractor Account'}</button>
             </div>
           </div>

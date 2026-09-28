@@ -5,7 +5,7 @@ export function Card({ children, className = '', header, footer, ...props }) {
   return (
     <div
       className={clsx(
-        'bg-[#111A2E] border border-[#1E2A44] rounded-lg shadow-sm',
+        'tg-card bg-[#111A2E] border border-[#1E2A44] rounded-lg shadow-sm',
         className
       )}
       {...props}

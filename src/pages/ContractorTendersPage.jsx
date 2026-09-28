@@ -24,7 +24,7 @@ export function ContractorTendersPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">Browse Tenders</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">Browse Tenders</div>
           <h1 className="mt-2 text-3xl font-bold text-white">Open procurement opportunities</h1>
         </div>
       </div>
@@ -48,7 +48,7 @@ export function ContractorTendersPage() {
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-medium text-blue-300">{tender.id}</span>
+                  <span className="text-sm font-medium text-[#FF8A72]">{tender.id}</span>
                   <StatusBadge status={tender.status} />
                 </div>
                 <h2 className="mt-2 text-xl font-semibold text-white">{tender.title}</h2>

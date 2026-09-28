@@ -17,7 +17,7 @@ export function ContractorPaymentsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">Payments</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">Payments</div>
         <h1 className="mt-2 text-3xl font-bold text-white">Escrow & disbursements</h1>
       </div>
 

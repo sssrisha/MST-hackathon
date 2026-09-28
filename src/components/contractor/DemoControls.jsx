@@ -47,7 +47,7 @@ export function DemoControls() {
       <button
         type="button"
         onClick={advanceTenderPhase}
-        className="inline-flex items-center gap-1 rounded bg-blue-600 px-2 py-1 text-white hover:bg-blue-500"
+        className="inline-flex items-center gap-1 rounded bg-[#FF4B3E] px-2 py-1 text-white hover:bg-[#FF6B4A]"
       >
         <ArrowRightLeft className="h-3.5 w-3.5" />
         Advance tender phase

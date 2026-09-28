@@ -17,7 +17,7 @@ export function DecisionBreakdown({
     <Card className={clsx('overflow-hidden', className)}>
       <div className="flex items-center justify-between pb-4 border-b border-[#1E2A44]">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-md bg-[#0B1220] border border-[#1E2A44] flex items-center justify-center text-blue-400">
+          <div className="w-7 h-7 rounded-md bg-[#0B1220] border border-[#1E2A44] flex items-center justify-center text-[#FF6B4A]">
             <BarChart3 className="w-4 h-4" />
           </div>
           <div>
@@ -42,7 +42,7 @@ export function DecisionBreakdown({
             <div className="flex justify-between items-center text-xs">
               <div className="flex items-center gap-2">
                 <span className="font-medium text-slate-200">{item.label || item.factor}</span>
-                <span className="text-[11px] px-1.5 py-0.2 rounded bg-blue-950/50 border border-blue-900/60 text-blue-300 font-mono">
+                <span className="text-[11px] px-1.5 py-0.2 rounded bg-[#FF4B3E]/[0.07] border border-[#FF4B3E]/20 text-[#FF9A82] font-mono">
                   {item.weight}% weight
                 </span>
               </div>
@@ -57,7 +57,7 @@ export function DecisionBreakdown({
             {/* Contribution visual bar */}
             <div className="w-full h-1.5 rounded-full bg-[#111A2E] border border-[#1E2A44] overflow-hidden">
               <div
-                className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                className="h-full rounded-full bg-[#FF4B3E] transition-all duration-300"
                 style={{ width: `${Math.min(100, item.subScore)}%` }}
               />
             </div>

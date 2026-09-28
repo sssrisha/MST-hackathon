@@ -7,20 +7,35 @@
   --text-primary: #FFFFFF;
   --text-secondary: #CBD5E1;
   --text-muted: #64748B;
-  --primary-blue: #3B82F6;
   --semantic-green: #22C55E;
   --semantic-amber: #F59E0B;
   --semantic-red: #EF4444;
+  --tg-bg: #05070D;
+  --tg-card: #0D1424;
+  --tg-accent: #FF4B3E;
+  --tg-accent-secondary: #FF6B4A;
+  --tg-text: #FFFFFF;
+  --tg-muted: #94A3B8;
+  --tg-border: rgba(255, 255, 255, 0.10);
+  --tg-status-success: #22C55E;
+  --tg-status-warning: #F59E0B;
+  --tg-status-danger: #EF4444;
+  --tg-status-info: #3B82F6;
 }
 
 @theme {
   --color-app-bg: #0B1220;
   --color-surface: #111A2E;
   --color-border-slate: #1E2A44;
-  --color-primary-blue: #3B82F6;
   --color-semantic-green: #22C55E;
   --color-semantic-amber: #F59E0B;
   --color-semantic-red: #EF4444;
+  --color-tg-accent: #FF4B3E;
+  --color-tg-accent-secondary: #FF6B4A;
+  --color-tg-status-success: #22C55E;
+  --color-tg-status-warning: #F59E0B;
+  --color-tg-status-danger: #EF4444;
+  --color-tg-status-info: #3B82F6;
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
@@ -42,6 +57,84 @@ body {
 .font-mono-hash {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+.tg-internal {
+  --bg-app: var(--tg-bg);
+  --surface-card: var(--tg-card);
+  --border-slate: var(--tg-border);
+  --text-primary: var(--tg-text);
+  --text-secondary: #CBD5E1;
+  --text-muted: var(--tg-muted);
+  background-color: var(--tg-bg);
+}
+
+.tg-internal [class*="bg-[#0B1220]"] {
+  background-color: var(--tg-bg) !important;
+}
+
+.tg-internal [class*="bg-[#111A2E]"],
+.tg-internal [class*="bg-[#0E1626]"] {
+  background-color: var(--tg-card) !important;
+}
+
+.tg-internal [class*="border-[#1E2A44]"] {
+  border-color: var(--tg-border) !important;
+}
+
+.tg-internal [class~="bg-blue-600"] {
+  background-color: var(--tg-accent) !important;
+}
+
+.tg-internal [class~="hover:bg-blue-500"]:hover {
+  background-color: var(--tg-accent-secondary) !important;
+}
+
+.tg-internal [class~="focus:ring-blue-500"]:focus {
+  --tw-ring-color: var(--tg-accent) !important;
+}
+
+.tg-internal :focus {
+  outline: 2px solid var(--tg-accent);
+  outline-offset: 2px;
+}
+
+.tg-internal .tg-card {
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.tg-internal .tg-card:hover {
+  border-color: rgba(255, 75, 62, 0.3);
+  box-shadow: 0 12px 32px rgba(255, 75, 62, 0.055);
+}
+
+@media (max-width: 767px) {
+  .tg-internal > .flex-1.flex {
+    flex-direction: column;
+  }
+
+  .tg-internal aside {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .tg-internal main {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .tg-internal header > div:last-child {
+    gap: 0.5rem;
+  }
+
+  .tg-internal header div.rounded-lg button {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .tg-internal header div.rounded-lg button span {
+    display: none;
+  }
 }
 
 .landing-root {

@@ -70,7 +70,7 @@ export function RevealBidPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">{bid.tenderId}</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">{bid.tenderId}</div>
           <h1 className="mt-2 text-3xl font-bold text-white">Reveal committed bid</h1>
         </div>
         <StatusBadge status={bid.status === 'VERIFIED' ? 'VERIFIED' : 'OPEN'} />

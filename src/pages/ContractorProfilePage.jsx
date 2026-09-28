@@ -36,7 +36,7 @@ export function ContractorProfilePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">Identity</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">Identity</div>
           <h1 className="mt-2 text-3xl font-bold text-white">Supplier Profile</h1>
         </div>
         <button type="button" onClick={handleSave} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"> <Save className="h-4 w-4" /> {saving ? 'Saving...' : 'Save'} </button>

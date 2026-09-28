@@ -19,7 +19,7 @@ export function TenderDetailsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">{tender.id}</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">{tender.id}</div>
           <h1 className="mt-2 text-3xl font-bold text-white">{tender.title}</h1>
         </div>
         <StatusBadge status={tender.status || 'OPEN'} />

@@ -10,12 +10,12 @@ export function Topbar() {
       {/* Brand Wordmark */}
       <div className="flex items-center gap-3">
         <Link to="/" className="flex items-center gap-2.5 text-white hover:opacity-90 transition-opacity">
-          <div className="w-8 h-8 rounded-md bg-[#111A2E] border border-[#1E2A44] flex items-center justify-center text-blue-400 shadow-sm">
+          <div className="w-8 h-8 rounded-md bg-[#111A2E] border border-[#1E2A44] flex items-center justify-center text-[#FF6B4A] shadow-sm">
             <Shield className="w-4 h-4" />
           </div>
           <div className="flex flex-col">
             <span className="font-semibold text-base tracking-tight text-white flex items-center">
-              Tender<span className="text-blue-400">Guard</span>
+              Tender<span className="text-[#FF6B4A]">Guard</span>
             </span>
           </div>
         </Link>
