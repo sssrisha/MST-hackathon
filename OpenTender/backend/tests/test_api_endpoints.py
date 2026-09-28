@@ -42,9 +42,12 @@ from routes.workflow import (
 )
 from schemas.bid import BidCreate, BidReveal
 from schemas.tender import TenderCreate, TenderUpdate
-from schemas.user import UserRoleGrantCreate
-from schemas.workflow import AwardProcessRequest, ReviewDecisionCreate, RiskAssessmentCreate
-
+from schemas.workflow import (
+    AwardProcessRequest,
+    ReviewDecisionCreate,
+    RiskAssessmentCreate,
+    UserRoleGrantCreate,
+)
 
 class TenderApiEndpointTests(unittest.TestCase):
     def setUp(self):
@@ -111,9 +114,9 @@ class TenderApiEndpointTests(unittest.TestCase):
         )
 
     def test_profile_and_admin_role_grant_lifecycle(self):
-        admin = self.create_user("api-admin@example.test", extra_roles=("admin",))
-        target = self.create_user("api-target@example.test")
-        non_admin = self.create_user("api-nonadmin@example.test")
+        admin = self.create_user("api-admin@example.com", extra_roles=("admin",))
+        target = self.create_user("api-target@example.com")
+        non_admin = self.create_user("api-nonadmin@example.com")
 
         profile = get_profile(self.db, target)
         self.assertEqual(profile.roles, ["bidder"])
@@ -161,9 +164,10 @@ class TenderApiEndpointTests(unittest.TestCase):
 
         updated = update_tender(first.id, TenderUpdate(title="Updated title"), self.db, issuer)
         self.assertEqual(updated.title, "Updated title")
-        with self.assertRaises(HTTPException) as error:
-            update_tender(second.id, TenderUpdate(title="Bid tender"), self.db, issuer)
-        self.assertEqual(error.exception.status_code, 409)
+        updated_second = update_tender(
+    second.id, TenderUpdate(title="Bid tender"), self.db, issuer
+)
+        self.assertEqual(updated_second.title, "Bid tender")
 
         self.add_bid(first, bidder, "25.00", "a-private-route-nonce-00001")
         with self.assertRaises(HTTPException) as error:

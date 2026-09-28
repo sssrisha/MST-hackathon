@@ -92,95 +92,95 @@ def get_current_user(
     return user
 
 
-    CurrentUser = Annotated[User, Depends(get_current_user)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
-    @router.get("/me", response_model=UserProfileResponse)
-    def get_profile(db: DatabaseSession, user: CurrentUser):
-        additional_roles = [
-            grant.role
-            for grant in db.query(UserRoleGrant)
-            .filter(UserRoleGrant.user_id == user.id, UserRoleGrant.is_active.is_(True))
-            .order_by(UserRoleGrant.role)
-            .all()
-        ]
-        return UserProfileResponse(
-            id=user.id,
-            name=user.name,
-            email=user.email,
-            role=user.role,
-            is_active=user.is_active,
-            roles=sorted({user.role, *additional_roles}),
-        )
+@router.get("/me", response_model=UserProfileResponse)
+def get_profile(db: DatabaseSession, user: CurrentUser):
+    additional_roles = [
+        grant.role
+        for grant in db.query(UserRoleGrant)
+        .filter(UserRoleGrant.user_id == user.id, UserRoleGrant.is_active.is_(True))
+        .order_by(UserRoleGrant.role)
+        .all()
+    ]
+    return UserProfileResponse(
+        id=user.id,
+        name=user.name,
+        email=user.email,
+        role=user.role,
+        is_active=user.is_active,
+        roles=sorted({user.role, *additional_roles}),
+    )
 
 
-    @router.put("/users/{user_id}/roles", response_model=UserRoleGrantResponse)
-    def grant_additional_role(
-        user_id: Annotated[int, Path(gt=0)],
-        payload: UserRoleGrantCreate,
-        db: DatabaseSession,
-        actor: CurrentUser,
-    ):
-        if not user_has_role(db, actor, "admin"):
-            raise HTTPException(status_code=403, detail="Only administrators can grant supplemental roles")
-        target = db.get(User, user_id)
-        if target is None:
-            raise HTTPException(status_code=404, detail="User not found")
+@router.put("/users/{user_id}/roles", response_model=UserRoleGrantResponse)
+def grant_additional_role(
+    user_id: Annotated[int, Path(gt=0)],
+    payload: UserRoleGrantCreate,
+    db: DatabaseSession,
+    actor: CurrentUser,
+):
+    if not user_has_role(db, actor, "admin"):
+        raise HTTPException(status_code=403, detail="Only administrators can grant supplemental roles")
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="User not found")
 
-        grant = (
-            db.query(UserRoleGrant)
-            .filter(UserRoleGrant.user_id == user_id, UserRoleGrant.role == payload.role)
-            .first()
-        )
-        if grant is not None and grant.is_active:
-            return grant
-        if grant is None:
-            grant = UserRoleGrant(
-                user_id=user_id,
-                role=payload.role,
-                granted_by_user_id=actor.id,
-                is_active=True,
-            )
-            db.add(grant)
-        else:
-            grant.is_active = True
-            grant.granted_by_user_id = actor.id
-        try:
-            commit_or_rollback(db)
-        except IntegrityError:
-            raise HTTPException(status_code=409, detail="This role grant already exists")
-        db.refresh(grant)
+    grant = (
+        db.query(UserRoleGrant)
+        .filter(UserRoleGrant.user_id == user_id, UserRoleGrant.role == payload.role)
+        .first()
+    )
+    if grant is not None and grant.is_active:
         return grant
-
-
-    @router.delete("/users/{user_id}/roles/{role}", status_code=status.HTTP_204_NO_CONTENT)
-    def revoke_additional_role(
-        user_id: Annotated[int, Path(gt=0)],
-        role: Annotated[Literal["reviewer", "admin", "auditor"], Path()],
-        db: DatabaseSession,
-        actor: CurrentUser,
-    ):
-        if not user_has_role(db, actor, "admin"):
-            raise HTTPException(status_code=403, detail="Only administrators can revoke supplemental roles")
-        grant = (
-            db.query(UserRoleGrant)
-            .filter(
-                UserRoleGrant.user_id == user_id,
-                UserRoleGrant.role == role,
-                UserRoleGrant.is_active.is_(True),
-            )
-            .first()
+    if grant is None:
+        grant = UserRoleGrant(
+            user_id=user_id,
+            role=payload.role,
+            granted_by_user_id=actor.id,
+            is_active=True,
         )
-        if grant is None:
-            raise HTTPException(status_code=404, detail="Active role grant not found")
-        if role == "admin":
-            admin_count = (
-                db.query(UserRoleGrant.id)
-                .filter(UserRoleGrant.role == "admin", UserRoleGrant.is_active.is_(True))
-                .count()
-            )
-            if admin_count <= 1:
-                raise HTTPException(status_code=409, detail="Cannot revoke the last active administrator")
-        grant.is_active = False
+        db.add(grant)
+    else:
+        grant.is_active = True
+        grant.granted_by_user_id = actor.id
+    try:
         commit_or_rollback(db)
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except IntegrityError:
+        raise HTTPException(status_code=409, detail="This role grant already exists")
+    db.refresh(grant)
+    return grant
+
+
+@router.delete("/users/{user_id}/roles/{role}", status_code=status.HTTP_204_NO_CONTENT)
+def revoke_additional_role(
+    user_id: Annotated[int, Path(gt=0)],
+    role: Annotated[Literal["reviewer", "admin", "auditor"], Path()],
+    db: DatabaseSession,
+    actor: CurrentUser,
+):
+    if not user_has_role(db, actor, "admin"):
+        raise HTTPException(status_code=403, detail="Only administrators can revoke supplemental roles")
+    grant = (
+        db.query(UserRoleGrant)
+        .filter(
+            UserRoleGrant.user_id == user_id,
+            UserRoleGrant.role == role,
+            UserRoleGrant.is_active.is_(True),
+        )
+        .first()
+    )
+    if grant is None:
+        raise HTTPException(status_code=404, detail="Active role grant not found")
+    if role == "admin":
+        admin_count = (
+            db.query(UserRoleGrant.id)
+            .filter(UserRoleGrant.role == "admin", UserRoleGrant.is_active.is_(True))
+            .count()
+        )
+        if admin_count <= 1:
+            raise HTTPException(status_code=409, detail="Cannot revoke the last active administrator")
+    grant.is_active = False
+    commit_or_rollback(db)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
