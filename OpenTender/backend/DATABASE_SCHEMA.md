@@ -1,0 +1,9 @@
+# Database Schema Notes
+
+The active backend uses SQLAlchemy metadata in `models/`; FastAPI startup calls `Base.metadata.create_all()`. The workflow persistence added here is additive: it introduces `user_role_grants`, `bid_reveal_records`, `risk_assessments`, `review_decisions`, `decision_records`, `awards`, `blockchain_transactions`, and `audit_events`, plus ORM relationships. It does not add, rename, or remove columns from existing `users`, `tenders`, or `bids` tables. Startup can create the missing workflow tables without dropping existing tables or rewriting existing rows.
+
+No migration is required for these additions. `create_all()` is not a general migration system: future changes to existing columns, constraints, or column types require a versioned migration. Alembic is not currently configured.
+
+Before any future migration that changes existing tables, stop the backend and make a verified copy of `opentender.db` (or use a consistent SQLite backup while the service is running). Apply the migration to a copy first, verify row counts and relationships, then apply it to the original database with a rollback plan. Never use `drop_all()` against the persistent application database.
+
+Risk, review, award, blockchain transaction, and role-grant records currently have persistence models and validation schemas, but no corresponding API routes. Tender creation, bid commitment, and bid reveal now write audit events in the same database transaction as their primary records; reveal also has a separate timestamped record. Audit hashes are optional supplied fields: the database does not compute hashes or guarantee append-only tamper evidence. New API services must validate actor roles and cross-record ownership, including matching an award's tender, decision, and bid, before writing.

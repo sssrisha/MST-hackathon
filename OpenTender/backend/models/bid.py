@@ -28,3 +28,6 @@ class Bid(Base):
 
     tender = relationship("Tender", back_populates="bids")
     bidder = relationship("User", back_populates="bids")
+    reveal_records = relationship("BidRevealRecord", back_populates="bid")
+    award = relationship("Award", back_populates="winning_bid", uselist=False)
+    blockchain_transactions = relationship("BlockchainTransaction", back_populates="bid")

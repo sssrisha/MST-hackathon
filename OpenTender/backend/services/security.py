@@ -52,7 +52,12 @@ def create_access_token(user_id: int) -> str:
 
 def decode_access_token(token: str) -> int | None:
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(
+            token,
+            JWT_SECRET,
+            algorithms=[JWT_ALGORITHM],
+            options={"require_exp": True, "require_sub": True},
+        )
         return int(payload["sub"])
     except (JWTError, KeyError, TypeError, ValueError):
         return None
