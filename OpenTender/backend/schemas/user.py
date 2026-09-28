@@ -13,7 +13,7 @@ class UserCreate(BaseModel):
 
 class LoginRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=128)
 
 
 class UserResponse(BaseModel):
@@ -24,6 +24,10 @@ class UserResponse(BaseModel):
     email: EmailStr
     role: str
     is_active: bool
+
+
+class UserProfileResponse(UserResponse):
+    roles: list[str]
 
 
 class AuthResponse(BaseModel):
