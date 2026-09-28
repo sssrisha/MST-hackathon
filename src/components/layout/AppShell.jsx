@@ -4,7 +4,7 @@ import Sidebar from './Sidebar.jsx';
 
 export function AppShell({ children }) {
   return (
-    <div className="min-h-screen bg-[#0B1220] text-slate-100 flex flex-col font-sans">
+    <div className="tg-internal min-h-screen bg-[#0B1220] text-slate-100 flex flex-col font-sans">
       <Topbar />
 
       <div className="flex-1 flex">

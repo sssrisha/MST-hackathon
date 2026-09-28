@@ -18,7 +18,7 @@ export function ContractorContractsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">Active Contracts</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">Active Contracts</div>
         <h1 className="mt-2 text-3xl font-bold text-white">Contract performance</h1>
       </div>
 
@@ -32,7 +32,7 @@ export function ContractorContractsPage() {
               <Card>
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <div className="text-sm text-blue-300">{contract.id || contract.tenderId}</div>
+                    <div className="text-sm text-[#FF8A72]">{contract.id || contract.tenderId}</div>
                     <h3 className="mt-1 text-xl font-semibold text-white">{contract.title}</h3>
                   </div>
                   <span className="rounded-full border border-blue-800 bg-blue-950/40 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-blue-300">{contract.status}</span>

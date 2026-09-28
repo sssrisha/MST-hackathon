@@ -82,7 +82,7 @@ export function SubmitBidPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">{tender.id}</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">{tender.id}</div>
           <h1 className="mt-2 text-3xl font-bold text-white">Submit sealed bid</h1>
         </div>
         <StatusBadge status={tender.status || 'OPEN'} />
@@ -107,7 +107,7 @@ export function SubmitBidPage() {
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <label className="text-sm font-medium text-slate-200">Random salt</label>
-                <button type="button" onClick={handleGenerateSalt} className="text-xs text-blue-300 hover:text-blue-200">Generate salt</button>
+                <button type="button" onClick={handleGenerateSalt} className="text-xs text-[#FF8A72] hover:text-[#FFB09C]">Generate salt</button>
               </div>
               <input
                 value={form.salt}

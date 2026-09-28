@@ -89,7 +89,7 @@ export function Sidebar() {
       {/* Role banner in sidebar */}
       <div className="hidden px-5 py-4 border-b border-[#1E2A44] bg-[#0E1626]/50 md:block">
         <div className="flex items-center gap-2 text-xs text-slate-400 uppercase tracking-wider font-semibold">
-          <Building2 className="w-3.5 h-3.5 text-blue-400" />
+          <Building2 className="w-3.5 h-3.5 text-[#FF6B4A]" />
           <span>Active Role</span>
         </div>
         <p className="text-sm font-medium text-white capitalize mt-0.5">
@@ -115,8 +115,8 @@ export function Sidebar() {
                     clsx(
                       'flex items-center justify-center gap-3 rounded-md px-2 py-2 text-xs font-medium transition-colors md:justify-start md:px-3',
                       isActive
-                        ? 'bg-[#1E2A44] text-white border-l-2 border-blue-500 font-semibold'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-[#111A2E]'
+                        ? 'bg-[#FF4B3E]/10 text-white border-l-2 border-[#FF4B3E] font-semibold'
+                        : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                     )
                   }
                 >

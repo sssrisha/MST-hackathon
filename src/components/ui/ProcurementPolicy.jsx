@@ -53,7 +53,7 @@ export function ProcurementPolicy({
 
             <div className="w-24 sm:w-32 h-1.5 rounded-full bg-[#111A2E] border border-[#1E2A44] overflow-hidden shrink-0">
               <div
-                className="h-full rounded-full bg-blue-500"
+                className="h-full rounded-full bg-[#FF4B3E]"
                 style={{ width: `${factor.weight}%` }}
               />
             </div>

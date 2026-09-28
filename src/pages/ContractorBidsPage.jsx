@@ -15,7 +15,7 @@ export function ContractorBidsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">My Bids</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">My Bids</div>
         <h1 className="mt-2 text-3xl font-bold text-white">Submitted and revealed bids</h1>
       </div>
 
@@ -27,7 +27,7 @@ export function ContractorBidsPage() {
             <Card key={bid.bidId}>
               <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <div className="flex items-center gap-2"><span className="text-sm font-medium text-blue-300">{bid.bidId}</span><StatusBadge status={bid.status === 'COMMITTED' ? 'OPEN' : bid.status} /></div>
+                  <div className="flex items-center gap-2"><span className="text-sm font-medium text-[#FF8A72]">{bid.bidId}</span><StatusBadge status={bid.status === 'COMMITTED' ? 'OPEN' : bid.status} /></div>
                   <h2 className="mt-2 text-xl font-semibold text-white">{bid.tenderTitle || bid.tenderId}</h2>
                   <div className="mt-2 text-sm text-slate-400">Submitted: {new Date(bid.submittedAt).toLocaleString()}</div>
                 </div>

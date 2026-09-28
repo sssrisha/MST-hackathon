@@ -55,17 +55,17 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1220] text-slate-100 flex items-center justify-center px-4 py-10">
+    <div className="tg-internal min-h-screen bg-[#0B1220] text-slate-100 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-5xl rounded-2xl border border-[#1E2A44] bg-[#111A2E] shadow-2xl overflow-hidden">
         <div className="grid md:grid-cols-2">
           <div className="relative hidden md:flex items-center justify-center bg-[#0B1220] p-10 border-r border-[#1E2A44]">
             <div className="max-w-sm">
               <div className="mb-6 flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-blue-950/40 border border-blue-900/60 flex items-center justify-center text-blue-400">
+                <div className="w-11 h-11 rounded-xl bg-[#FF4B3E]/10 border border-[#FF4B3E]/25 flex items-center justify-center text-[#FF6B4A]">
                   <Shield className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-2xl font-semibold tracking-tight text-white">Tender<span className="text-blue-400">Guard</span></div>
+                  <div className="text-2xl font-semibold tracking-tight text-white">Tender<span className="text-[#FF6B4A]">Guard</span></div>
                   <div className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Contractor Login</div>
                 </div>
               </div>
@@ -74,15 +74,15 @@ export function LoginPage() {
               </p>
               <div className="mt-8 rounded-xl border border-[#1E2A44] bg-[#0E1626]/80 p-4 text-sm text-slate-300">
                 <div className="font-semibold text-white mb-2">Demo access</div>
-                <div className="flex items-center gap-2 text-slate-400"><Mail className="w-4 h-4 text-blue-400" /> demo@abcinfra.example</div>
-                <div className="flex items-center gap-2 mt-2 text-slate-400"><Lock className="w-4 h-4 text-blue-400" /> demo1234</div>
+                <div className="flex items-center gap-2 text-slate-400"><Mail className="w-4 h-4 text-[#FF6B4A]" /> demo@abcinfra.example</div>
+                <div className="flex items-center gap-2 mt-2 text-slate-400"><Lock className="w-4 h-4 text-[#FF6B4A]" /> demo1234</div>
               </div>
             </div>
           </div>
 
           <div className="p-6 sm:p-10">
             <div className="mb-8">
-              <div className="text-xs uppercase tracking-[0.18em] text-blue-400 font-semibold">Welcome back</div>
+              <div className="text-xs uppercase tracking-[0.18em] text-[#FF6B4A] font-semibold">Welcome back</div>
               <h1 className="mt-2 text-3xl font-bold text-white">Sign in to your contractor portal</h1>
             </div>
 
@@ -153,13 +153,13 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={handleDemoLogin}
-                  className="mt-3 w-full rounded-xl border border-blue-700 bg-blue-950/40 px-4 py-3 text-sm font-semibold text-blue-200 hover:bg-blue-900/40"
+                    className="mt-3 w-full rounded-xl border border-[#FF4B3E]/35 bg-[#FF4B3E]/[0.06] px-4 py-3 text-sm font-semibold text-[#FF9A82] hover:bg-[#FF4B3E]/[0.12]"
                 >
                   Continue as demo contractor
                 </button>
                 <div className="mt-4 text-center text-sm text-slate-400">
                   Need an account?{' '}
-                  <Link to="/contractor/signup" className="font-medium text-blue-300 hover:text-blue-200">Create Contractor Account</Link>
+                  <Link to="/contractor/signup" className="font-medium text-[#FF8A72] hover:text-[#FFB09C]">Create Contractor Account</Link>
                 </div>
               </div>
             </form>
