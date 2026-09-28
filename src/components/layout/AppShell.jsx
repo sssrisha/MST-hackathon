@@ -10,7 +10,7 @@ export function AppShell({ children }) {
       <div className="flex-1 flex">
         <Sidebar />
 
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+        <main className="min-w-0 flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
           {children}
         </main>
       </div>

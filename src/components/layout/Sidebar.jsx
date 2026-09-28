@@ -85,9 +85,9 @@ export function Sidebar() {
   const sections = navItemsByRole[role] || navItemsByRole.auditor;
 
   return (
-    <aside className="w-64 bg-[#0B1220] border-r border-[#1E2A44] flex flex-col shrink-0 min-h-[calc(100vh-4rem)]">
+    <aside className="w-12 md:w-64 bg-[#0B1220] border-r border-[#1E2A44] flex flex-col shrink-0 min-h-[calc(100vh-4rem)]">
       {/* Role banner in sidebar */}
-      <div className="px-5 py-4 border-b border-[#1E2A44] bg-[#0E1626]/50">
+      <div className="hidden px-5 py-4 border-b border-[#1E2A44] bg-[#0E1626]/50 md:block">
         <div className="flex items-center gap-2 text-xs text-slate-400 uppercase tracking-wider font-semibold">
           <Building2 className="w-3.5 h-3.5 text-blue-400" />
           <span>Active Role</span>
@@ -98,10 +98,10 @@ export function Sidebar() {
       </div>
 
       {/* Navigation list */}
-      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <nav className="flex-1 px-1 py-4 space-y-6 overflow-y-auto md:px-3">
         {sections.map((sec, secIdx) => (
           <div key={secIdx} className="space-y-1">
-            <h4 className="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <h4 className="mb-2 hidden px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider md:block">
               {sec.section}
             </h4>
             {sec.items.map((item) => {
@@ -109,10 +109,11 @@ export function Sidebar() {
               return (
                 <NavLink
                   key={item.to}
+                  title={item.label}
                   to={item.to}
                   className={({ isActive }) =>
                     clsx(
-                      'flex items-center gap-3 px-3 py-2 rounded-md text-xs font-medium transition-colors',
+                      'flex items-center justify-center gap-3 rounded-md px-2 py-2 text-xs font-medium transition-colors md:justify-start md:px-3',
                       isActive
                         ? 'bg-[#1E2A44] text-white border-l-2 border-blue-500 font-semibold'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-[#111A2E]'
@@ -120,7 +121,7 @@ export function Sidebar() {
                   }
                 >
                   <Icon className="w-4 h-4 shrink-0 text-slate-400" />
-                  <span>{item.label}</span>
+                  <span className="hidden md:inline">{item.label}</span>
                 </NavLink>
               );
             })}
@@ -150,7 +151,7 @@ export function Sidebar() {
       </nav>
 
       {/* Trust & Verification note */}
-      <div className="p-4 border-t border-[#1E2A44] text-xs text-slate-400 leading-relaxed bg-[#0E1626]/40">
+      <div className="hidden p-4 border-t border-[#1E2A44] text-xs text-slate-400 leading-relaxed bg-[#0E1626]/40 md:block">
         <p className="font-medium text-slate-300 mb-0.5">Tamper-Evident Record</p>
         <p className="text-[11px] text-slate-400">
           AI analyzes. Blockchain enforces. Humans oversee.

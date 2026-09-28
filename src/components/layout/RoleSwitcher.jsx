@@ -24,7 +24,7 @@ export function RoleSwitcher() {
             type="button"
             onClick={() => setRole(r.id)}
             className={clsx(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150',
+              'flex items-center gap-1.5 px-1.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150 sm:px-3',
               isActive
                 ? 'bg-[#1E2A44] text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-[#111A2E]/60'
@@ -32,7 +32,7 @@ export function RoleSwitcher() {
             title={`Switch to ${r.label} perspective`}
           >
             <Icon className={clsx('w-3.5 h-3.5', isActive ? 'text-blue-400' : 'text-slate-400')} />
-            <span>{r.label}</span>
+            <span className="hidden sm:inline">{r.label}</span>
           </button>
         );
       })}

@@ -15,6 +15,37 @@ import * as tenderService from './tenderService.js';
 import * as riskService from './riskService.js';
 import * as escrowService from './escrowService.js';
 
+const BLOCKCHAIN_API_BASE = import.meta.env.VITE_BLOCKCHAIN_API_URL || 'http://127.0.0.1:3001';
+
+async function blockchainRequest(path) {
+  let response;
+  try {
+    response = await fetch(`${BLOCKCHAIN_API_BASE}${path}`, {
+      headers: { Accept: 'application/json' }
+    });
+  } catch {
+    throw new Error('Unable to connect to the local blockchain backend.');
+  }
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.error || `Blockchain API request failed (${response.status}).`);
+  }
+  return data;
+}
+
+export function getBlockchainHealth() {
+  return blockchainRequest('/api/blockchain/health');
+}
+
+export function getTenderSummary(tenderId) {
+  return blockchainRequest(`/api/blockchain/tenders/${encodeURIComponent(tenderId)}/summary`);
+}
+
+export function getDemoTender() {
+  return blockchainRequest('/api/blockchain/demo/tender');
+}
+
 export const USE_MOCK = true;
 
 export async function getTenders() {

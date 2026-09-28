@@ -1,0 +1,16 @@
+{
+  "network": "hardhat-local",
+  "chainId": "31337",
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "SupplierRegistry": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
+  "TenderGuard": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+  "ProcurementEscrow": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+  "deployedAt": "2026-09-28T17:32:52.390Z",
+  "transactions": {
+    "registryDeployment": "0xc5941e1db1fc37d0248e39a7e0ae5d40316301c9f5f4427ba602eae53e32eaad",
+    "tenderGuardDeployment": "0xbeb8b5ec3ec7cc62b52e8be9f50bd125a5fea59d54b8715966e99635d84491fc",
+    "escrowDeployment": "0x1fa502aacdb42ebaaf7c41a86e71e0d27855a13a5c94d06c9cd1354140c6d50c",
+    "registryTenderGuardAuthorization": "0x2f44853fbe2adeaffde5de4210eb4ac0dac73c44111f78e730f1b7988403f3cb",
+    "registryEscrowAuthorization": "0xc887eee2f2a789f1a769b909d5228030ec0793a23ee17c797c66c7c84dfbc7f6"
+  }
+}
