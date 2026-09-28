@@ -34,8 +34,12 @@ async function blockchainRequest(path) {
   return data;
 }
 
-export function getBlockchainHealth() {
-  return blockchainRequest('/api/blockchain/health');
+export async function getBlockchainHealth() {
+  const data = await blockchainRequest('/health');
+  return {
+    connected: data?.status === 'healthy' || data?.status === 'ok' || Boolean(data?.connected),
+    ...data
+  };
 }
 
 export function getTenderSummary(tenderId) {

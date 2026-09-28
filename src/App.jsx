@@ -30,6 +30,7 @@ import AuditorBlockchainPage from './pages/AuditorBlockchainPage.jsx';
 import SuppliersListPage from './pages/SuppliersListPage.jsx';
 import SupplierDetailsPage from './pages/SupplierDetailsPage.jsx';
 import DevComponentsPage from './pages/DevComponentsPage.jsx';
+import TenderMapPage from './pages/TenderMapPage.jsx';
 import Placeholder from './components/ui/Placeholder.jsx';
 
 function ContractorRoute() {
@@ -76,7 +77,7 @@ function AppRoutes() {
           </AppShell>
         }
       >
-        <Route path="/map" element={<Placeholder title="Tender Map" description="The interactive tender map is planned for a later phase. This preview uses illustrative seed locations only." />} />
+        <Route path="/map" element={<TenderMapPage />} />
         <Route path="/admin" element={<AdminDashboardPage />} />
         <Route path="/admin/tenders" element={<AdminTendersPage />} />
         <Route path="/admin/create" element={<CreateTenderPage />} />
