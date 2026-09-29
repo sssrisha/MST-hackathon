@@ -6,9 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from database import get_db
-from models import Bid, Tender, User
-from routes.auth import get_current_user
+from database import commit_or_rollback, get_db
+from models import AuditEvent, Bid, BidRevealRecord, Tender, User
+from routes.auth import get_current_user, user_has_role
 from schemas.bid import BidCreate, BidResponse, BidReveal, BidSubmitted
 from services.security import commitment_matches, create_commitment, decrypt_amount, encrypt_amount
 
@@ -29,7 +29,7 @@ def _deadline_has_passed(deadline: datetime) -> bool:
     status_code=status.HTTP_201_CREATED,
 )
 def submit_bid(tender_id: int, payload: BidCreate, db: DatabaseSession, user: CurrentUser):
-    if user.role != "bidder":
+    if not user_has_role(db, user, "bidder"):
         raise HTTPException(status_code=403, detail="Only bidders can submit bids")
     tender = db.query(Tender).filter(Tender.id == tender_id).first()
     if tender is None:
@@ -47,10 +47,22 @@ def submit_bid(tender_id: int, payload: BidCreate, db: DatabaseSession, user: Cu
     )
     db.add(bid)
     try:
-        db.commit()
+        db.flush()
+        db.add(
+            AuditEvent(
+                tender_id=tender.id,
+                actor_user_id=user.id,
+                event_type="BID_COMMITTED",
+                payload={"bid_id": bid.id, "commitment_hash": commitment_hash},
+            )
+        )
+        commit_or_rollback(db)
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=409, detail="You have already bid on this tender")
+    except Exception:
+        db.rollback()
+        raise
     db.refresh(bid)
     return BidSubmitted(
         id=bid.id,
@@ -64,7 +76,7 @@ def list_tender_bids(tender_id: int, db: DatabaseSession, user: CurrentUser):
     tender = db.query(Tender).filter(Tender.id == tender_id).first()
     if tender is None:
         raise HTTPException(status_code=404, detail="Tender not found")
-    if user.role != "issuer" or tender.creator_id != user.id:
+    if not user_has_role(db, user, "issuer") or tender.creator_id != user.id:
         raise HTTPException(status_code=403, detail="Only the tender issuer can view its bids")
 
     bids = db.query(Bid).filter(Bid.tender_id == tender_id).order_by(Bid.submitted_at).all()
@@ -87,8 +99,10 @@ def reveal_bid(bid_id: int, payload: BidReveal, db: DatabaseSession, user: Curre
     bid = db.query(Bid).filter(Bid.id == bid_id).first()
     if bid is None:
         raise HTTPException(status_code=404, detail="Bid not found")
-    if bid.bidder_id != user.id or user.role != "bidder":
+    if bid.bidder_id != user.id or not user_has_role(db, user, "bidder"):
         raise HTTPException(status_code=403, detail="Only the bidder can reveal this bid")
+    if bid.tender.status not in {"open", "closed", "revealing"}:
+        raise HTTPException(status_code=409, detail="The tender is not in the reveal stage")
     if not _deadline_has_passed(bid.tender.submission_deadline):
         raise HTTPException(status_code=400, detail="Bids can only be revealed after the deadline")
 
@@ -96,7 +110,24 @@ def reveal_bid(bid_id: int, payload: BidReveal, db: DatabaseSession, user: Curre
     if not commitment_matches(amount, payload.nonce, bid.commitment_hash):
         raise HTTPException(status_code=400, detail="Nonce does not match this bid commitment")
     bid.is_revealed = True
-    db.commit()
+    if bid.tender.status in {"open", "closed"}:
+        bid.tender.status = "revealing"
+    db.add(
+        BidRevealRecord(
+            bid_id=bid.id,
+            revealed_by_user_id=user.id,
+            revealed_amount=Decimal(amount),
+        )
+    )
+    db.add(
+        AuditEvent(
+            tender_id=bid.tender_id,
+            actor_user_id=user.id,
+            event_type="BID_REVEALED",
+            payload={"bid_id": bid.id, "amount": amount},
+        )
+    )
+    commit_or_rollback(db)
     db.refresh(bid)
     return BidResponse(
         id=bid.id,

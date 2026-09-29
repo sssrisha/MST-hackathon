@@ -1,3 +1,4 @@
+import asyncio
 import os
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -5,6 +6,8 @@ from decimal import Decimal
 
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
+from jose import jwt
+from pydantic import ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -13,14 +16,14 @@ os.environ.setdefault("JWT_SECRET", "test-only-jwt-secret-that-is-at-least-32-by
 os.environ.setdefault("BID_ENCRYPTION_KEY", "test-only-bid-encryption-key-32-bytes")
 
 from database import Base
-from models import Bid, Tender, User
-from routes.auth import get_current_user, login, register
+from models import AuditEvent, Bid, BidRevealRecord, Tender, User, UserRoleGrant
+from routes.auth import get_current_user, login, register, user_has_role
 from routes.bids import list_tender_bids, reveal_bid, submit_bid
 from routes.tenders import create_tender, list_tenders
 from schemas.bid import BidCreate, BidReveal
 from schemas.tender import TenderCreate
 from schemas.user import LoginRequest, UserCreate
-from services.security import commitment_matches
+from services.security import JWT_ALGORITHM, JWT_SECRET, commitment_matches
 
 
 class TenderWorkflowTests(unittest.TestCase):
@@ -142,6 +145,18 @@ class TenderWorkflowTests(unittest.TestCase):
             login(LoginRequest(email="login@example.com", password="WrongPass123"), self.db)
         self.assertEqual(error.exception.status_code, 401)
 
+    def test_login_rejects_unknown_email_with_same_safe_message(self):
+        with self.assertRaises(HTTPException) as error:
+            login(LoginRequest(email="missing@example.com", password="ValidPass123"), self.db)
+        self.assertEqual(error.exception.status_code, 401)
+        self.assertEqual(error.exception.detail, "Invalid email or password")
+
+    def test_login_password_input_is_bounded(self):
+        with self.assertRaises(ValidationError):
+            LoginRequest(email="login@example.com", password="")
+        with self.assertRaises(ValidationError):
+            LoginRequest(email="login@example.com", password="x" * 129)
+
     def test_bearer_token_authenticates_user_and_rejects_invalid_token(self):
         user = register(
             UserCreate(name="Bidder", email="token@example.com", password="ValidPass123"),
@@ -155,6 +170,132 @@ class TenderWorkflowTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as error:
             get_current_user(invalid, self.db)
         self.assertEqual(error.exception.status_code, 401)
+
+    def test_bearer_auth_rejects_missing_non_bearer_expired_and_unbounded_tokens(self):
+        user = register(
+            UserCreate(name="Bidder", email="claims@example.com", password="ValidPass123"),
+            self.db,
+        )
+        invalid_credentials = [
+            None,
+            HTTPAuthorizationCredentials(scheme="Basic", credentials="not-a-bearer-token"),
+        ]
+        expired = jwt.encode(
+            {"sub": str(user.id), "exp": int((datetime.now(timezone.utc) - timedelta(minutes=1)).timestamp())},
+            JWT_SECRET,
+            algorithm=JWT_ALGORITHM,
+        )
+        missing_expiration = jwt.encode({"sub": str(user.id)}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+        wrong_signature = jwt.encode(
+            {"sub": str(user.id), "exp": int((datetime.now(timezone.utc) + timedelta(minutes=5)).timestamp())},
+            "different-test-signing-key-that-is-not-the-configured-secret",
+            algorithm=JWT_ALGORITHM,
+        )
+        invalid_credentials.extend(
+            HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
+            for token in (expired, missing_expiration, wrong_signature)
+        )
+
+        for credentials in invalid_credentials:
+            with self.subTest(credentials=credentials.scheme if credentials else "missing"):
+                with self.assertRaises(HTTPException) as error:
+                    get_current_user(credentials, self.db)
+                self.assertEqual(error.exception.status_code, 401)
+
+    def test_inactive_user_cannot_use_an_unexpired_token(self):
+        user = register(
+            UserCreate(name="Inactive", email="inactive@example.com", password="ValidPass123"),
+            self.db,
+        )
+        token = login(
+            LoginRequest(email="inactive@example.com", password="ValidPass123"),
+            self.db,
+        ).access_token
+        user.is_active = False
+        self.db.commit()
+        credentials = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
+
+        with self.assertRaises(HTTPException) as error:
+            get_current_user(credentials, self.db)
+        self.assertEqual(error.exception.status_code, 401)
+
+    def test_supplemental_roles_are_active_only_and_do_not_escalate_primary_role(self):
+        user = self.create_user("role-grant@example.com", "bidder")
+        grant = UserRoleGrant(user_id=user.id, role="reviewer", is_active=True)
+        inactive_grant = UserRoleGrant(user_id=user.id, role="auditor", is_active=False)
+        self.db.add_all([grant, inactive_grant])
+        self.db.commit()
+
+        self.assertTrue(user_has_role(self.db, user, "bidder"))
+        self.assertTrue(user_has_role(self.db, user, "reviewer"))
+        self.assertFalse(user_has_role(self.db, user, "auditor"))
+        self.assertFalse(user_has_role(self.db, user, "issuer"))
+
+    def test_cors_is_explicit_and_does_not_enable_cookie_credentials(self):
+        from unittest.mock import patch
+
+        from fastapi.middleware.cors import CORSMiddleware
+
+        from main import app, get_cors_origins
+
+        with patch.dict(os.environ, {"CORS_ORIGINS": "https://frontend.example.test,http://localhost:3000"}):
+            self.assertEqual(
+                get_cors_origins(),
+                ["https://frontend.example.test", "http://localhost:3000"],
+            )
+        with patch.dict(os.environ, {"CORS_ORIGINS": "*"}):
+            with self.assertRaises(RuntimeError):
+                get_cors_origins()
+
+        cors = next(middleware for middleware in app.user_middleware if middleware.cls is CORSMiddleware)
+        self.assertFalse(cors.kwargs["allow_credentials"])
+        self.assertIn("Authorization", cors.kwargs["allow_headers"])
+
+        async def verify_preflight():
+            messages = []
+
+            async def downstream(scope, receive, send):
+                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send({"type": "http.response.body", "body": b""})
+
+            async def receive():
+                return {"type": "http.request", "body": b"", "more_body": False}
+
+            async def send(message):
+                messages.append(message)
+
+            middleware = CORSMiddleware(
+                downstream,
+                allow_origins=["https://frontend.example.test"],
+                allow_credentials=False,
+                allow_methods=["GET", "POST"],
+                allow_headers=["Authorization", "Content-Type"],
+            )
+            await middleware(
+                {
+                    "type": "http",
+                    "asgi": {"version": "3.0"},
+                    "method": "OPTIONS",
+                    "scheme": "https",
+                    "path": "/tenders",
+                    "raw_path": b"/tenders",
+                    "query_string": b"",
+                    "headers": [
+                        (b"origin", b"https://frontend.example.test"),
+                        (b"access-control-request-method", b"POST"),
+                        (b"access-control-request-headers", b"authorization,content-type"),
+                    ],
+                },
+                receive,
+                send,
+            )
+            return messages
+
+        preflight_messages = asyncio.run(verify_preflight())
+        preflight_headers = dict(preflight_messages[0]["headers"])
+        self.assertEqual(preflight_headers[b"access-control-allow-origin"], b"https://frontend.example.test")
+        self.assertIn(b"authorization", preflight_headers[b"access-control-allow-headers"].lower())
+        self.assertNotIn(b"access-control-allow-credentials", preflight_headers)
 
     def test_non_utc_deadline_keeps_its_utc_instant(self):
         issuer = self.create_user("issuer@example.com", "issuer")
@@ -210,6 +351,16 @@ class TenderWorkflowTests(unittest.TestCase):
         self.assertEqual(revealed.amount, amount)
         self.assertTrue(revealed.is_revealed)
         self.assertEqual(list_tender_bids(tender.id, self.db, issuer)[0].amount, amount)
+        reveal_record = self.db.query(BidRevealRecord).filter_by(bid_id=bid.id).one()
+        self.assertEqual(reveal_record.revealed_amount, amount)
+        audit_types = [
+            event.event_type
+            for event in self.db.query(AuditEvent)
+            .filter_by(tender_id=tender.id)
+            .order_by(AuditEvent.id)
+            .all()
+        ]
+        self.assertEqual(audit_types, ["TENDER_CREATED", "BID_COMMITTED", "BID_REVEALED"])
 
     def test_expired_tender_rejects_bid_submission(self):
         issuer = self.create_user("issuer@example.com", "issuer")
@@ -236,6 +387,12 @@ class TenderWorkflowTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as error:
             submit_bid(tender.id, payload, self.db, bidder)
         self.assertEqual(error.exception.status_code, 409)
+        self.assertEqual(
+            self.db.query(AuditEvent)
+            .filter_by(tender_id=tender.id, event_type="BID_COMMITTED")
+            .count(),
+            1,
+        )
 
         with self.assertRaises(HTTPException) as error:
             reveal_bid(first_bid.id, BidReveal(nonce=payload.nonce), self.db, other_issuer)

@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from sqlalchemy import create_engine, event
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 DATABASE_PATH = Path(__file__).resolve().parent / "opentender.db"
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DATABASE_PATH.as_posix()}")
@@ -37,3 +37,11 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def commit_or_rollback(db: Session) -> None:
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise

@@ -18,3 +18,38 @@ class User(Base):
 
     tenders = relationship("Tender", back_populates="creator")
     bids = relationship("Bid", back_populates="bidder")
+    bid_reveals = relationship(
+        "BidRevealRecord",
+        foreign_keys="BidRevealRecord.revealed_by_user_id",
+        back_populates="revealed_by",
+    )
+    additional_roles = relationship(
+        "UserRoleGrant",
+        foreign_keys="UserRoleGrant.user_id",
+        back_populates="user",
+    )
+    risk_assessments = relationship(
+        "RiskAssessment",
+        foreign_keys="RiskAssessment.assessed_by_user_id",
+        back_populates="assessor",
+    )
+    review_decisions = relationship(
+        "ReviewDecision",
+        foreign_keys="ReviewDecision.reviewer_user_id",
+        back_populates="reviewer",
+    )
+    decision_records = relationship(
+        "DecisionRecord",
+        foreign_keys="DecisionRecord.actor_user_id",
+        back_populates="actor",
+    )
+    awards = relationship(
+        "Award",
+        foreign_keys="Award.awarded_by_user_id",
+        back_populates="awarded_by",
+    )
+    audit_events = relationship(
+        "AuditEvent",
+        foreign_keys="AuditEvent.actor_user_id",
+        back_populates="actor",
+    )

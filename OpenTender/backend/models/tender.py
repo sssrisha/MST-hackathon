@@ -21,3 +21,9 @@ class Tender(Base):
 
     creator = relationship("User", back_populates="tenders")
     bids = relationship("Bid", back_populates="tender")
+    risk_assessments = relationship("RiskAssessment", back_populates="tender")
+    review_decisions = relationship("ReviewDecision", back_populates="tender")
+    decision_records = relationship("DecisionRecord", back_populates="tender")
+    award = relationship("Award", back_populates="tender", uselist=False)
+    blockchain_transactions = relationship("BlockchainTransaction", back_populates="tender")
+    audit_events = relationship("AuditEvent", back_populates="tender")
